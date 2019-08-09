@@ -4,7 +4,7 @@ import re
 import random
 
 files=[ #'test.cpp.gt',
-      'test2.cpp.gt']
+      'test.cpp.gt']
 
 # 用来将设计点的内容分隔开
 reSplitDesignPoint = re.compile(r'[\,\$]+')
@@ -13,7 +13,7 @@ reSplitExpress = re.compile(r'[\=\:]+')
 
 def variationCmp(matchstr):
   # 对运算符进行变异
-  operDist = {'chance':0.1, }
+  operDist = {'chance':0.1}
   for exprLine in matchstr:
     ekey,evalue = reSplitExpress.split(exprLine)
     # print(ekey)
@@ -33,6 +33,22 @@ def variationCmp(matchstr):
       else:
         operDist['Vvalue']="<="
   return operDist['Vvalue']
+
+def variationEnum(matchstr):
+  # 对枚举进行变异
+  enumsplit = re.compile(r'\|')
+  operDist = {'chance':0.1}
+  for exprLine in matchstr:
+    ekey,evalue = reSplitExpress.split(exprLine)
+    # print(ekey)
+    if ekey == 'opt':
+      operDist[ekey] = enumsplit.split(evalue)
+    elif ekey.find('enum') == 0:
+      operDist['Vname']=ekey
+      operDist['Vvalue']=evalue
+    # if operDist['chance'] > random.random():
+    print(operDist)
+  return operDist['opt'][random.randint(0,len(operDist['opt'])-1)]
 
 def variationVar(matchstr):
   # 对魔数进行变异
@@ -68,6 +84,8 @@ def restore(line):
     exprList = filter(None,reSplitDesignPoint.split(matchstr))
     if matchstr.find('$comp') == 0:
       return line.replace(matchObj.group(1),variationCmp(exprList))
+    elif matchstr.find('$enum') == 0:
+      return line.replace(matchObj.group(1),variationEnum(exprList))
     else:
       return line.replace(matchObj.group(1),variationVar(exprList))
     # 
