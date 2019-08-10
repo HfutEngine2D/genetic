@@ -22,16 +22,10 @@ def variationCmp(matchstr):
     elif ekey.find('comp') == 0:
       operDist['Vname']=ekey
       operDist['Vvalue']=evalue
-    if operDist['chance'] > random.random():
-      randomNumber = random.random()
-      if (randomNumber < 0.25):
-        operDist['Vvalue']=">"
-      elif (randomNumber < 0.5):
-        operDist['Vvalue']=">="
-      elif (randomNumber < 0.75):
-        operDist['Vvalue']="<"
-      else:
-        operDist['Vvalue']="<="
+  if operDist['chance'] > random.random():
+    randomNumber = random.random()
+    if (randomNumber < 0.25):
+      operDist['Vvalue']=[">",">=","<","<="][random.randint(0,3)]
   return operDist['Vvalue']
 
 def variationEnum(matchstr):
@@ -47,12 +41,12 @@ def variationEnum(matchstr):
       operDist['Vname']=ekey
       operDist['Vvalue']=evalue
     # if operDist['chance'] > random.random():
-    print(operDist)
+    # print(operDist)
   return operDist['opt'][random.randint(0,len(operDist['opt'])-1)]
 
 def variationVar(matchstr):
   # 对魔数进行变异
-  operDist = {'chance':0.2, 'step':0}
+  operDist = {'chance':0.2, 'step':0, 'max':53, 'min':-53}
   for exprLine in matchstr:
     ekey,evalue = reSplitExpress.split(exprLine)
     if (ekey == 'step') or (ekey == 'max') or (ekey == 'min') or (ekey == 'chance'):
@@ -60,11 +54,15 @@ def variationVar(matchstr):
     elif ekey.find('V') == 0:
       operDist['Vname']=ekey
       operDist['Vvalue']=float(evalue)
-    if operDist['chance'] > random.random():
-      if random.random()<0.5:
-        operDist['Vvalue'] += operDist['step']
-      else:
-        operDist['Vvalue'] -= operDist['step']
+  if operDist['chance'] > random.random():
+    if random.random()<0.5:
+      operDist['Vvalue'] += operDist['step']
+    else:
+      operDist['Vvalue'] -= operDist['step']
+  if operDist['Vvalue'] > operDist['max']:
+    operDist['Vvalue'] -= operDist['step']
+  elif operDist['Vvalue'] < operDist['max']:
+    operDist['Vvalue'] += operDist['step']
   return str(operDist['Vvalue'])
 
 def restore(line):
@@ -88,7 +86,6 @@ def restore(line):
       return line.replace(matchObj.group(1),variationEnum(exprList))
     else:
       return line.replace(matchObj.group(1),variationVar(exprList))
-    # 
   else:
     # 此行代码 没有设计点，直接返回
     return line
