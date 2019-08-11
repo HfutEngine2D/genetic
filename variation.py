@@ -1,20 +1,20 @@
-#!/usr/bin/python  
-# -*- coding: utf-8 -*-~
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import re
-import random
 import sqlite3
+import random
 
-conn = sqlite3.connect('g0-0.db')
-files=[ #'test.cpp.gt',
-      'test.cpp.gt']
+' 对数据库进行初始化，进行变异 '
+
+__author__ = 'bcahlit'
 
 # 用来将设计点的内容分隔开
 reSplitDesignPoint = re.compile(r'[\,\$]+')
 # 将表达式根据赋值号分开
 reSplitExpress = re.compile(r'[\=\:]+')
 
-def variationCmp(matchstr):
-  # 对运算符进行变异
+def variationCmp(matchstr, currentValue = None):
+  # 对运算符进行初始化
   operDist = {'chance':0.1}
   for exprLine in matchstr:
     ekey,evalue = reSplitExpress.split(exprLine)
@@ -30,7 +30,7 @@ def variationCmp(matchstr):
       operDist['Vvalue']=[">",">=","<","<="][random.randint(0,3)]
   return operDist['Vvalue']
 
-def variationEnum(matchstr):
+def variationEnum(matchstr, currentValue = None):
   # 对枚举进行变异
   enumsplit = re.compile(r'\|')
   operDist = {'chance':0.1}
@@ -46,7 +46,7 @@ def variationEnum(matchstr):
     # print(operDist)
   return operDist['opt'][random.randint(0,len(operDist['opt'])-1)]
 
-def variationVar(matchstr):
+def variationVar(matchstr, currentValue = None):
   # 对魔数进行变异
   operDist = {'chance':0.2, 'step':0, 'max':53, 'min':-53}
   for exprLine in matchstr:
@@ -56,6 +56,8 @@ def variationVar(matchstr):
     elif ekey.find('V') == 0:
       operDist['Vname']=ekey
       operDist['Vvalue']=float(evalue)
+  if currentValue != None:
+    operDist['Vvalue']=float(currentValue)
   if operDist['chance'] > random.random():
     if random.random()<0.5:
       operDist['Vvalue'] += operDist['step']
@@ -67,39 +69,11 @@ def variationVar(matchstr):
     operDist['Vvalue'] += operDist['step']
   return str(operDist['Vvalue'])
 
-def restore(line):
-  """将一些设计点还原为实际的代码
-  
-  Arguments:
-      line {读入的行} -- 判断是否有设计点，如果没有直接返回，有的话还原为实际代码
-  """
-
-  # 用来把字符串中的设计点提取出来，以及替换回去。
-  design_point = re.compile(r'[\s\S]*(\$[\s\S]*\$)[\s\S]*')
-  # 提取出来的数据
-  matchObj = design_point.match(line)
-  if matchObj:
-    # 有设计点，拆分为表达式传入对应类型的变异函数
-    matchstr = matchObj.group(1).replace(' ','')
-    exprList = filter(None,reSplitDesignPoint.split(matchstr))
-    if matchstr.find('$comp') == 0:
-      return line.replace(matchObj.group(1),variationCmp(exprList))
-    elif matchstr.find('$enum') == 0:
-      return line.replace(matchObj.group(1),variationEnum(exprList))
-    else:
-      return line.replace(matchObj.group(1),variationVar(exprList))
+def variation(paramStr,value):
+  exprList = filter(None,reSplitDesignPoint.split(paramStr))
+  if paramStr.find('$comp') == 0:
+    return variationCmp(exprList, currentValue = value)
+  elif paramStr.find('$enum') == 0:
+    return variationEnum(exprList, currentValue = value)
   else:
-    # 此行代码 没有设计点，直接返回
-    return line
-  #matchstr = design_point.match('if (a>$V1 = 10,step = 0.5, type = float$)').group(1).replace(' ','')
-  # print(filter(None,reSplitDesignPoint.split(matchstr)))
-
-for file in files:
-  fr = open("./"+file,'r')
-  fw = open(file.replace('.gt',''),'w')
-  for line in fr.readlines():
-    line = restore(line)
-    print(line)
-    # fw.write(line)
-  fw.close()
-  fr.close()
+    return variationVar(exprList, currentValue = value)
