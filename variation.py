@@ -17,20 +17,24 @@ def variationCmp(matchstr, currentValue = None):
   # 对运算符进行初始化
   operDist = {'chance':0.1}
   for exprLine in matchstr:
+    # print(exprLine)
+    # print(reSplitExpress.split(exprLine))
     ekey,evalue = reSplitExpress.split(exprLine)
-    # print(ekey)
     if (ekey == 'step') or (ekey == 'max') or (ekey == 'min') or (ekey == 'chance'):
       operDist[ekey] = float(evalue)
     elif ekey.find('comp') == 0:
       operDist['Vname']=ekey
       operDist['Vvalue']=evalue
+  # print(operDist)\
+  if currentValue != None:
+    operDist['Vvalue']=currentValue
   if operDist['chance'] > random.random():
     randomNumber = random.random()
     if (randomNumber < 0.25):
       operDist['Vvalue']=[">",">=","<","<="][random.randint(0,3)]
   return operDist['Vvalue']
 
-def variationEnum(matchstr, currentValue = None):
+def variationEnum(matchstr, currentValue=None):
   # 对枚举进行变异
   enumsplit = re.compile(r'\|')
   operDist = {'chance':0.1}
@@ -46,7 +50,7 @@ def variationEnum(matchstr, currentValue = None):
     # print(operDist)
   return operDist['opt'][random.randint(0,len(operDist['opt'])-1)]
 
-def variationVar(matchstr, currentValue = None):
+def variationVar(matchstr, currentValue=None):
   # 对魔数进行变异
   operDist = {'chance':0.2, 'step':0, 'max':53, 'min':-53}
   for exprLine in matchstr:
@@ -58,6 +62,7 @@ def variationVar(matchstr, currentValue = None):
       operDist['Vvalue']=float(evalue)
   if currentValue != None:
     operDist['Vvalue']=float(currentValue)
+  # print(operDist)
   if operDist['chance'] > random.random():
     if random.random()<0.5:
       operDist['Vvalue'] += operDist['step']
@@ -65,7 +70,7 @@ def variationVar(matchstr, currentValue = None):
       operDist['Vvalue'] -= operDist['step']
   if operDist['Vvalue'] > operDist['max']:
     operDist['Vvalue'] -= operDist['step']
-  elif operDist['Vvalue'] < operDist['max']:
+  elif operDist['Vvalue'] < operDist['min']:
     operDist['Vvalue'] += operDist['step']
   return str(operDist['Vvalue'])
 

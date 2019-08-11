@@ -39,7 +39,7 @@ def calAdaptability():
 def createGeneration():
   with open('genstate', 'r') as f:
     genstate = f.read()
-  print(genstate)
+  # print(genstate)
   if genstate == '0':
     conn = DbHandler('Origin.db')
     for i in range(0,chromosomeNum):
