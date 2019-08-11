@@ -5,6 +5,7 @@ class DbHandler():
 
   def __init__(self, name):
     self.__data_name = name
+    self.open()
 
   def open(self):
     self.__conn = sqlite3.connect(self.__data_name)
@@ -14,7 +15,7 @@ class DbHandler():
     self.__conn.commit()
     self.__conn.close()
 
-  def Create(self, cycle):
+  def Create(self):
     self.__c.execute('create table Chromosome (Vkey varchar(20) primary key, Vvalue varchar(20), paramStr varchar(50))')
 
   def list_chromosome(self):
@@ -23,6 +24,11 @@ class DbHandler():
     for row in cursor:
       list_return.append(row)
     return list_return
+
+  def insert(self, Vkey, Vvalue, changStr):
+    self.__c.execute('insert into Chromosome (Vkey, Vvalue, paramStr) values (\'{}\', \'{}\', \'{}\')'
+          .format(Vkey,Vvalue,changStr))
+
   def dict_player(self, cycle, object):
     dict_return = {}
     cursor = self.__c.execute('SELECT POSX,POSY,VELX,VELY,BODYDIR,STAMINA FROM RCDATA \

@@ -16,9 +16,8 @@ reSplitDesignPoint = re.compile(r'[\,\$]+')
 reSplitExpress = re.compile(r'[\=\:]+')
 
 def initOriginChromosome(files):
-  conn = sqlite3.connect('Origin.db')
-  cursor = conn.cursor()
-  cursor.execute('create table Chromosome (Vkey varchar(20) primary key, Vvalue varchar(20), paramStr varchar(50))')
+  conn = DbHandler('Origin.db')
+  conn.Create()
   for file in files:
     fr = open("./"+file,'r')
     for line in fr.readlines():
@@ -28,11 +27,8 @@ def initOriginChromosome(files):
         matchstr = matchObj.group(1).replace(' ','')
         exprList = filter(None,reSplitDesignPoint.split(matchstr))
         ekey,evalue = reSplitExpress.split(list(exprList)[0])
-        cursor.execute('insert into Chromosome (Vkey, Vvalue, paramStr) values (\'{}\', \'{}\', \'{}\')'
-          .format(ekey,evalue,matchstr))
+        conn.insert(ekey,evalue,matchstr)
     fr.close()
-  cursor.close()
-  conn.commit()
   conn.close()
   with open('genstate', 'w') as f:
     f.write("0")
@@ -45,25 +41,17 @@ def createGeneration():
     genstate = f.read()
   print(genstate)
   if genstate == '0':
-    conn = sqlite3.connect('Origin.db')
-    cursor = conn.cursor()
+    conn = DbHandler('Origin.db')
     for i in range(0,chromosomeNum):
       print("chromosomeNum")
-      cursor.execute('select * from Chromosome')
-      conn_new = sqlite3.connect('{}_{}.db'.format(int(genstate)+1,i))
-      cursor_new = conn_new.cursor()
-      cursor_new.execute('create table Chromosome (Vkey varchar(20) primary key, Vvalue varchar(20), paramStr varchar(50))')
-      for row in cursor:
-        cursor_new.execute('insert into Chromosome (Vkey, Vvalue, paramStr) values (\'{}\', \'{}\', \'{}\')'
-          .format(row[0],variation.variation(row[2],row[1]),row[2]))
-      cursor_new.close()
-      conn_new.commit()
+      conn_new = DbHandler('{}_{}.db'.format(int(genstate)+1,i))
+      conn_new.Create()
+      for row in conn.list_chromosome():
+        conn_new.insert(row[0],variation.variation(row[2],row[1]),row[2])
       conn_new.close()
-    cursor.close()
-    conn.commit()
     conn.close()
   else:
-    
+    pass
   with open('genstate', 'w') as f:
     f.write(str(int(genstate)+1))
 
