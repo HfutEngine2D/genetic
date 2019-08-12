@@ -27,6 +27,8 @@ reSplitDesignPoint = re.compile(r'[\,\$]+')
 # 将表达式根据赋值号分开
 reSplitExpress = re.compile(r'[\=\:]+')
 
+reGetWinRate = re.compile(r'[\s\S]*ExpectedWinRate\s(\d*[.]\d*)%')
+
 files=[ #'test.cpp.gt',
       'test.cpp.gt']
 
@@ -69,8 +71,17 @@ def wirte2file(dbstr):
     fr.close()
   conn.close()
 
-def makeAndTest(parameter_list):
-  pass
+def makeAndTest():
+  os.system('cd ../HfutEngine2019/ && make -j8 && \
+      cp -r HfutEngine-release ../autotest2d-master/teams && \
+      cd ../autotest2d-master && \
+      ./test.sh')
+  output = os.popen("cd ../autotest2d-master && ./result.sh | grep ExpectedWinRate", "r")
+  result=output.read()
+  reGetWinRate.match(result)
+  return float(reGetWinRate.match(result).group(1))
+
+
 # 计算适应度
 def calAdaptability():
   global Adaptability
@@ -79,9 +90,9 @@ def calAdaptability():
     genstate = f.read()
   
   for i in range(0,chromosomeNum):
-    Adaptability['{}_{}.db'.format(int(genstate),i)]=random.randint(30,60)
-    # wirte2file(,'{}_{}.db'.format(int(genstate),i))
-    # Adaptability['{}_{}.db'.format(int(genstate),i)]=makeAndTest()
+    # Adaptability['{}_{}.db'.format(int(genstate),i)]=random.randint(30,60)
+    wirte2file(,'{}_{}.db'.format(int(genstate),i))
+    Adaptability['{}_{}.db'.format(int(genstate),i)]=makeAndTest()
   with open('./Adaptability/{}_value'.format(int(genstate)), 'w') as f:
     f.write(str("34"))
   # sorted_x=sorted(x.items(), key=operator.itemgetter(1))
@@ -186,6 +197,4 @@ def initGA() :
   gaSearch()
   # 渲染视图
   # draw(resultData)
-
-
 initGA()
