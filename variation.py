@@ -52,6 +52,7 @@ def variationEnum(matchstr, currentValue=None):
 
 def variationVar(matchstr, currentValue=None):
   # 对魔数进行变异
+  # print(currentValue)
   operDist = {'chance':0.2, 'step':0, 'max':53, 'min':-53}
   for exprLine in matchstr:
     ekey,evalue = reSplitExpress.split(exprLine)
@@ -62,7 +63,6 @@ def variationVar(matchstr, currentValue=None):
       operDist['Vvalue']=float(evalue)
   if currentValue != None:
     operDist['Vvalue']=float(currentValue)
-  # print(operDist)
   if operDist['chance'] > random.random():
     if random.random()<0.5:
       operDist['Vvalue'] += operDist['step']
@@ -72,6 +72,7 @@ def variationVar(matchstr, currentValue=None):
     operDist['Vvalue'] -= operDist['step']
   elif operDist['Vvalue'] < operDist['min']:
     operDist['Vvalue'] += operDist['step']
+  # print(operDist)
   return str(operDist['Vvalue'])
 
 def variation(paramStr,value):

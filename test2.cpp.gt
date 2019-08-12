@@ -1,9 +1,9 @@
 #include <iostream>
 int main(){
   int a = 10;
-  if (a>$V1=10,step=0.5,max=15,min=5$)
+  if (a>$Vt21=10,step=0.5,max=15,min=5$)
     std::cout<<"变异条件小于10";
-  if (a<$V2=10,step=0.5,type=float$)
+  if (a<$Vt22=10,step=0.5,type=float$)
     std::cout<<"变异条件大于10";
-  if(a$compC1=<,chance=0.05$10)std::cout<<"运算符发生变异"
+  if(a$compCt21=<,chance=0.05$10)std::cout<<"运算符发生变异"
 }

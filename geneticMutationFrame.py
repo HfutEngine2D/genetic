@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-~
 import os
 import re
@@ -27,6 +27,9 @@ reSplitDesignPoint = re.compile(r'[\,\$]+')
 # 将表达式根据赋值号分开
 reSplitExpress = re.compile(r'[\=\:]+')
 
+files=[ #'test.cpp.gt',
+      'test.cpp.gt']
+
 def initOriginChromosome(files):
   conn = DbHandler('Origin.db')
   conn.Create()
@@ -45,16 +48,42 @@ def initOriginChromosome(files):
   with open('genstate', 'w') as f:
     f.write("0")
 
+def wirte2file(dbstr):
+  global files
+  conn = DbHandler(dbstr)
+  for file in files:
+    fr = open("./"+file,'r')
+    fw = open(file.replace('.gt',''),'w')
+    for line in fr.readlines():
+      matchObj = design_point.match(line)
+      if matchObj:
+        # 有设计点，拆分为key 从数据库查询替换
+        matchstr = matchObj.group(1).replace(' ','')
+        exprList = filter(None,reSplitDesignPoint.split(matchstr))
+        ekey,evalue = reSplitExpress.split(list(exprList)[0])
+        # print(conn.getValueByKey(ekey))
+        line = line.replace(matchObj.group(1),str(conn.getValueByKey(ekey)))
+      # print(line)
+      fw.write(line)
+    fw.close()
+    fr.close()
+  conn.close()
+
+def makeAndTest(parameter_list):
+  pass
+# 计算适应度
 def calAdaptability():
   global Adaptability
   Adaptability.clear()
   with open('genstate', 'r') as f:
     genstate = f.read()
-  # 计算适应度
+  
   for i in range(0,chromosomeNum):
     Adaptability['{}_{}.db'.format(int(genstate),i)]=random.randint(30,60)
+    # wirte2file(,'{}_{}.db'.format(int(genstate),i))
+    # Adaptability['{}_{}.db'.format(int(genstate),i)]=makeAndTest()
   with open('./Adaptability/{}_value'.format(int(genstate)), 'w') as f:
-    f.write(str(Adaptability))
+    f.write(str("34"))
   # sorted_x=sorted(x.items(), key=operator.itemgetter(1))
   # print(Adaptability)
   # for i in range(0,crossoverMutationNum):
@@ -77,10 +106,11 @@ def calSelectionProbability():
     # 计算每条染色体的选择概率
     for key, value in Adaptability.items():
         selectionProbability[key]= (value / sumAdaptability)
-    
+
+# 转盘轮赌法
 def RWS():
   global selectionProbability
-  print(selectionProbability)
+  # print(selectionProbability)
   sum = 0
   rand = random.random()
   for key,value in selectionProbability.items():
@@ -119,16 +149,16 @@ def createGeneration():
           newChromosomeMatrix.append(chromosomeBaba[j])
         else:
           newChromosomeMatrix.append(chromosomeMama[j])
-      print('{}_{}.db'.format(int(genstate)+1,i))
+      # print('{}_{}.db'.format(int(genstate)+1,i))
       conn_new = DbHandler('{}_{}.db'.format(int(genstate)+1,i))
       conn_new.Create()
       for row in newChromosomeMatrix:
         conn_new.insert(row[0],variation.variation(row[2],row[1]),row[2])
       conn_new.close()
     sorted_x=sorted(Adaptability.items(), key=operator.itemgetter(1))
-    print("move")
-    print(Adaptability)
-    print(sorted_x)
+    # print("move")
+    # print(Adaptability)
+    # print(sorted_x)
     for i in range(crossoverMutationNum,chromosomeNum):
       shutil.copy(sorted_x[i][0], '{}_{}.db'.format(int(genstate)+1,i))
   with open('genstate', 'w') as f:
@@ -145,14 +175,17 @@ def gaSearch():
  #
  # 初始化遗传算法
  #
+
 def initGA() :
+  global files
   # 初始化染色体
   if not os.path.exists('Origin.db'):
     print("不存在源染色体，新建源染色体")
-    initOriginChromosome(['test.cpp.gt'])
+    initOriginChromosome(files)
 
   gaSearch()
   # 渲染视图
   # draw(resultData)
+
 
 initGA()

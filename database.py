@@ -26,6 +26,15 @@ class DbHandler():
       list_return.append(row)
     return list_return
 
+  def getValueByKey(self,key):
+    # print('select Vvalue from Chromosome where Vkey = \'{}\''.format(key))
+    cursor = self.__c.execute('select Vvalue from Chromosome where Vkey = \'{}\''.format(key))
+    for row in cursor:
+      # print(row)
+      return row[0]
+    return ''
+    
+
   def insert(self, Vkey, Vvalue, changStr):
     self.__c.execute('insert into Chromosome (Vkey, Vvalue, paramStr) values (\'{}\', \'{}\', \'{}\')'
           .format(Vkey,Vvalue,changStr))
