@@ -71,10 +71,10 @@ def calSelectionProbability():
     selectionProbability.clear()
     # 计算适应度总和
     sumAdaptability = 0.0
-    for eachvalue in Adaptability.itervalues():
+    for eachvalue in Adaptability.values():
       sumAdaptability+=eachvalue
     # 计算每条染色体的选择概率
-    for key, value in d.iteritems():
+    for key, value in Adaptability.items():
         selectionProbability[key]= (value / sumAdaptability)
 
 def RWS():
