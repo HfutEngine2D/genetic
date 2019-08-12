@@ -20,7 +20,7 @@ cp = 0.3
 # 迭代次数
 iteratorNum = 10
 # 交叉的染色体数
-crossoverMutationNum = chromosomeNum - chromosomeNum * cp
+crossoverMutationNum = int(chromosomeNum - chromosomeNum * cp)
 design_point = re.compile(r'[\s\S]*(\$[\s\S]*\$)[\s\S]*')
 # 用来将设计点的内容分隔开
 reSplitDesignPoint = re.compile(r'[\,\$]+')
@@ -52,8 +52,9 @@ def calAdaptability():
     genstate = f.read()
   # 计算适应度
   for i in range(0,chromosomeNum):
-    Adaptability['{}_{}.db'.format(int(genstate)+1,i)]=random.randint(30,60)
-
+    Adaptability['{}_{}.db'.format(int(genstate),i)]=random.randint(30,60)
+  with open('./Adaptability/{}_value'.format(int(genstate)), 'w') as f:
+    f.write(str(Adaptability))
   # sorted_x=sorted(x.items(), key=operator.itemgetter(1))
   # print(Adaptability)
   # for i in range(0,crossoverMutationNum):
@@ -76,12 +77,13 @@ def calSelectionProbability():
     # 计算每条染色体的选择概率
     for key, value in Adaptability.items():
         selectionProbability[key]= (value / sumAdaptability)
-
+    
 def RWS():
   global selectionProbability
+  print(selectionProbability)
   sum = 0
   rand = random.random()
-  for key,value in selectionProbability:
+  for key,value in selectionProbability.items():
         sum += value
         if (sum >= rand):
           conn = DbHandler(key)
@@ -112,11 +114,12 @@ def createGeneration():
       newChromosomeMatrix = []
       chromosomeBaba = RWS()
       chromosomeMama = RWS()
-      for i in range(0,len(chromosomeBaba)):
+      for j in range(0,len(chromosomeBaba)):
         if random.random()<0.5:
-          newChromosomeMatrix.append(chromosomeBaba[i])
+          newChromosomeMatrix.append(chromosomeBaba[j])
         else:
-          newChromosomeMatrix.append(chromosomeMama[i])
+          newChromosomeMatrix.append(chromosomeMama[j])
+      print('{}_{}.db'.format(int(genstate)+1,i))
       conn_new = DbHandler('{}_{}.db'.format(int(genstate)+1,i))
       conn_new.Create()
       for row in newChromosomeMatrix:

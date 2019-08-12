@@ -16,6 +16,7 @@ class DbHandler():
     self.__conn.close()
 
   def Create(self):
+    print(self.__data_name)
     self.__c.execute('create table Chromosome (Vkey varchar(20) primary key, Vvalue varchar(20), paramStr varchar(50))')
 
   def list_chromosome(self):
