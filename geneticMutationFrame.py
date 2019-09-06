@@ -30,7 +30,7 @@ reSplitExpress = re.compile(r'[\=\:]+')
 reGetWinRate = re.compile(r'[\s\S]*ExpectedWinRate\s(\d*[.]\d*)%')
 
 files=[ #'test.cpp.gt',
-      'test.cpp.gt']
+      '../HfutEngine2019/Sources/src/bhv_basic_move.cpp.gt']
 
 def initOriginChromosome(files):
   conn = DbHandler('Origin.db')
@@ -81,7 +81,6 @@ def makeAndTest():
   reGetWinRate.match(result)
   return float(reGetWinRate.match(result).group(1))
 
-
 # 计算适应度
 def calAdaptability():
   global Adaptability
@@ -91,19 +90,11 @@ def calAdaptability():
   
   for i in range(0,chromosomeNum):
     # Adaptability['{}_{}.db'.format(int(genstate),i)]=random.randint(30,60)
-    wirte2file(,'{}_{}.db'.format(int(genstate),i))
+    wirte2file('{}_{}.db'.format(int(genstate),i))
     Adaptability['{}_{}.db'.format(int(genstate),i)]=makeAndTest()
   with open('./Adaptability/{}_value'.format(int(genstate)), 'w') as f:
-    f.write(str("34"))
-  # sorted_x=sorted(x.items(), key=operator.itemgetter(1))
-  # print(Adaptability)
-  # for i in range(0,crossoverMutationNum):
+    f.write(str(Adaptability))
 
-  # # 先随机生成，以后再做，，，
-  # for i in range(0,chromosomeNum):
-  #   print("chromosomeNum")
-  #   with open('./Adaptability/{}_{}_value'.format(int(genstate)+1), 'w') as f:
-  #     f.write(str(random.randint(30,60)))
 
 # 计算自然选择概率
 def calSelectionProbability():

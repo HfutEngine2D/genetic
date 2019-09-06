@@ -36,5 +36,5 @@ class DbHandler():
     
 
   def insert(self, Vkey, Vvalue, changStr):
-    self.__c.execute('insert into Chromosome (Vkey, Vvalue, paramStr) values (\'{}\', \'{}\', \'{}\')'
-          .format(Vkey,Vvalue,changStr))
+    # print(Vkey)
+    self.__c.execute('insert into Chromosome (Vkey, Vvalue, paramStr) values (\'{}\', \'{}\', \'{}\')'.format(Vkey,Vvalue,changStr))
