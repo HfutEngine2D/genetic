@@ -6,7 +6,7 @@ import sqlite3
 
 conn = sqlite3.connect('g0-0.db')
 files=[ #'test.cpp.gt',
-      'test.cpp.gt']
+      'test2.cpp.gt']
 
 # 用来将设计点的内容分隔开
 reSplitDesignPoint = re.compile(r'[\,\$]+')
@@ -100,6 +100,6 @@ for file in files:
   for line in fr.readlines():
     line = restore(line)
     print(line)
-    # fw.write(line)
+    fw.write(line)
   fw.close()
   fr.close()
