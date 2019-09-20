@@ -6,7 +6,8 @@ import re
 reSplitExpress = re.compile(r'[\/\.]+')
 design_point = re.compile(r'[\s\S]*(\$[\s\S]*\$)[\s\S]*')
 
-files=['test2.cpp']
+files=['/Users/bcahlit/Desktop/HfutEngine2019/Sources/src/bhv_basic_move.433.cpp',
+        '/Users/bcahlit/Desktop/HfutEngine2019/Sources/src/sample_field_evaluator.2gt.cpp']
 
 case_total_num = 0
 
@@ -16,13 +17,13 @@ def addRandomeName(file,line):
   global case_total_num
   if matchObj:
     case_total_num += 1
-    return line.replace('_name_', reSplitExpress.split(file)[-2]+str(case_total_num))
+    return line.replace('_name_', str(case_total_num))
   else:
     # 此行代码 没有设计点，直接返回
     return line
 
 for file in files:
-  fr = open("./"+file,'r')
+  fr = open(file,'r')
   fw = open(file+'.gt','w')
   for line in fr.readlines():
     line = addRandomeName(file,line)

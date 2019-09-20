@@ -30,7 +30,13 @@ reSplitExpress = re.compile(r'[\=\:]+')
 reGetWinRate = re.compile(r'[\s\S]*ExpectedWinRate\s(\d*[.]\d*)%')
 
 files=[ #'test.cpp.gt',
-      '../HfutEngine2019/Sources/src/bhv_basic_move.cpp.gt']
+      '../HfutEngine2019/Sources/src/bhv_basic_move.cpp.gt',
+      '../HfutEngine2019/Sources/src/sample_field_evaluator.cpp.gt',
+      '../HfutEngine2019/Sources/src/bhv_mark_pass_line.cpp.gt',
+      '../HfutEngine2019/Sources/src/block_generator.cpp.gt',
+      '../HfutEngine2019/Sources/src/role_side_forward.cpp.gt',
+      '../HfutEngine2019/Sources/src/role_forward.cpp.gt',
+      '../HfutEngine2019/Sources/src/role_side_midfield.cpp.gt']
 
 def initOriginChromosome(files):
   conn = DbHandler('Origin.db')
