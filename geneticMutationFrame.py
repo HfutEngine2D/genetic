@@ -33,7 +33,7 @@ files=[ #'test.cpp.gt',
       '../HfutEngine2019/Sources/src/bhv_basic_move.cpp.gt',
       '../HfutEngine2019/Sources/src/sample_field_evaluator.cpp.gt',
       '../HfutEngine2019/Sources/src/bhv_mark_pass_line.cpp.gt',
-      '../HfutEngine2019/Sources/src/block_generator.cpp.gt',
+      '../HfutEngine2019/Sources/src/chain_action/block_generator.cpp.gt',
       '../HfutEngine2019/Sources/src/role_side_forward.cpp.gt',
       '../HfutEngine2019/Sources/src/role_forward.cpp.gt',
       '../HfutEngine2019/Sources/src/role_side_midfield.cpp.gt']
@@ -42,7 +42,7 @@ def initOriginChromosome(files):
   conn = DbHandler('Origin.db')
   conn.Create()
   for file in files:
-    fr = open("./"+file,'r')
+    fr = open(file,'r')
     for line in fr.readlines():
       matchObj = design_point.match(line)
       if matchObj:
@@ -85,7 +85,11 @@ def makeAndTest():
   output = os.popen("cd ../autotest2d-master && ./result.sh | grep ExpectedWinRate", "r")
   result=output.read()
   reGetWinRate.match(result)
-  return float(reGetWinRate.match(result).group(1))
+  winterRate = float(reGetWinRate.match(result).group(1))
+  if winterRate == 0:
+    return 0.01
+  else:
+    return winterRate
 
 # 计算适应度
 def calAdaptability():
